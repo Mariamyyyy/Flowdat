@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+
+<!-- ══ SEO Meta Tags ══ -->
+<title>FlowDay — ინტელექტუალური პროდუქტიულობის სისტემა</title>
+<meta name="description" content="FlowDay — AI-ზე დაფუძნებული task მენეჯმენტი. ავტომატური პრიორიტეტები, დღის გეგმა, Focus Mode და პროდუქტიულობის ანალიზი.">
+<meta name="keywords" content="task manager, productivity, todo, focus mode, პროდუქტიულობა, დავალებები">
+<meta name="author" content="FlowDay">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#6C5CE7">
+
+<!-- ══ Open Graph (სოციალური ქსელები) ══ -->
+<meta property="og:type"        content="website">
+<meta property="og:title"       content="FlowDay — ინტელექტუალური პროდუქტიულობის სისტემა">
+<meta property="og:description" content="AI-ზე დაფუძნებული task მენეჯმენტი — ავტომატური პრიორიტეტები და Focus Mode">
+<meta property="og:url"         content="http://localhost:5000">
+
+<!-- ══ Twitter Card ══ -->
+<meta name="twitter:card"        content="summary">
+<meta name="twitter:title"       content="FlowDay">
+<meta name="twitter:description" content="AI-ზე დაფუძნებული პროდუქტიულობის სისტემა">
+
+<!-- ══ Favicon ══ -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><polygon points='16,2 28,9 28,23 16,30 4,23 4,9' fill='%236C5CE7'/><circle cx='16' cy='16' r='5' fill='white'/></svg>">
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- ══ SIDEBAR ══════════════════════════════════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-hex">
+      <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
+        <polygon points="16,2 28,9 28,23 16,30 4,23 4,9" fill="#6C5CE7" opacity="0.9"/>
+        <polygon points="16,6 25,11 25,21 16,26 7,21 7,11" fill="none" stroke="white" stroke-width="1.5" opacity="0.6"/>
+        <circle cx="16" cy="16" r="4" fill="white" opacity="0.9"/>
+      </svg>
+    </div>
+    <div class="brand-text">
+      <div class="brand-name">FlowDay</div>
+      <div class="brand-sub">Productivity System</div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav" aria-label="მთავარი მენიუ">
+    <a class="nav-item active" onclick="showPage('dashboard')" data-page="dashboard" role="button">
+      <span class="nav-icon" aria-hidden="true">⊞</span> <span class="nav-label">Dashboard</span>
+    </a>
+    <a class="nav-item" onclick="showPage('tasks')" data-page="tasks" role="button">
+      <span class="nav-icon" aria-hidden="true">☰</span> <span class="nav-label">Tasks</span>
+    </a>
+    <a class="nav-item" onclick="showPage('focus')" data-page="focus" role="button">
+      <span class="nav-icon" aria-hidden="true">◎</span> <span class="nav-label">Focus Mode</span>
+    </a>
+    <a class="nav-item" onclick="showPage('analytics')" data-page="analytics" role="button">
+      <span class="nav-icon" aria-hidden="true">∿</span> <span class="nav-label">Analytics</span>
+    </a>
+    <a class="nav-item" onclick="showPage('goals')" data-page="goals" role="button">
+      <span class="nav-icon" aria-hidden="true">🎯</span> <span class="nav-label">Goals</span>
+    </a>
+    <a class="nav-item" onclick="showPage('notes')" data-page="notes" role="button">
+      <span class="nav-icon" aria-hidden="true">📝</span> <span class="nav-label">Notes</span>
+    </a>
+  </nav>
+
+  <a href="/logout" class="nav-item" style="color:#e74c3c;margin-bottom:8px" title="გასვლა">
+    <span class="nav-icon" aria-hidden="true">⎋</span> <span class="nav-label">გასვლა</span>
+  </a>
+  <div class="sidebar-quote">
+    <div class="quote-icon">❝</div>
+    <div class="quote-text">"The secret of getting ahead is getting started."</div>
+    <div class="quote-author">— Mark Twain</div>
+  </div>
+</aside>
+
+<!-- overlay მობილურისთვის -->
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+<!-- ══ MAIN ══════════════════════════════════════════ -->
+<div class="main-wrap">
+
+  <!-- Top Bar -->
+  <header class="topbar">
+    <button class="menu-toggle" onclick="toggleSidebar()" aria-label="მენიუ">☰</button>
+    <div class="topbar-brand-mobile">FlowDay</div>
+    <div class="topbar-right">
+      <button class="icon-btn" id="notif-btn" title="შეტყობინებები" aria-label="შეტყობინებები">
+        🔔<span class="notif-badge" id="notif-badge" aria-live="polite">0</span>
+      </button>
+      <div class="user-chip">
+        <div class="user-avatar" aria-hidden="true">{{ user_name[0]|upper if user_name else "U" }}</div>
+        <span class="user-name">{{ user_name }}</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ════════════════════════════════
+       PAGE: DASHBOARD
+  ════════════════════════════════ -->
+  <section class="page active" id="page-dashboard" aria-label="Dashboard">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Dashboard</h1>
+        <p class="page-sub">Welcome back, <strong>{{ user_name }}</strong>! 👋 <span id="date-label"></span></p>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-info">
+          <div class="stat-label">Total Tasks</div>
+          <div class="stat-value" id="s-total">—</div>
+          <div class="stat-hint">All time</div>
+        </div>
+        <div class="stat-icon" aria-hidden="true">📋</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-info">
+          <div class="stat-label">Completed</div>
+          <div class="stat-value" id="s-completed">—</div>
+          <div class="stat-hint">This month</div>
+        </div>
+        <div class="stat-icon" aria-hidden="true">✅</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-info">
+          <div class="stat-label">In Progress</div>
+          <div class="stat-value" id="s-progress">—</div>
+          <div class="stat-hint">Keep going!</div>
+        </div>
+        <div class="stat-icon" aria-hidden="true">⏳</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-info">
+          <div class="stat-label">Completion Rate</div>
+          <div class="stat-value" id="s-rate">—</div>
+          <div class="stat-hint">This month</div>
+        </div>
+        <div class="stat-icon" aria-hidden="true">📈</div>
+      </div>
+    </div>
+
+    <div class="dash-grid">
+      <div class="card task-table-card">
+        <div class="card-header">
+          <h2 class="card-title">My Tasks</h2>
+          <div class="filter-tabs" role="group" aria-label="პრიორიტეტის ფილტრი">
+            <button class="ftab active" onclick="filterTasks('all',this)">All</button>
+            <button class="ftab high"   onclick="filterTasks('High',this)">● High</button>
+            <button class="ftab medium" onclick="filterTasks('Medium',this)">● Medium</button>
+            <button class="ftab low"    onclick="filterTasks('Low',this)">● Low</button>
+          </div>
+          <button class="btn-add-task" onclick="showPage('tasks')">+ Add Task</button>
+        </div>
+        <div class="table-wrap">
+          <table class="task-table" aria-label="Task-ების სია">
+            <thead>
+              <tr>
+                <th scope="col"></th>
+                <th scope="col">Task</th>
+                <th scope="col">Deadline</th>
+                <th scope="col">Priority</th>
+                <th scope="col">Action</th>
+              </tr>
+            </thead>
+            <tbody id="dash-task-tbody">
+              <tr><td colspan="5" class="loading-row">იტვირთება...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer" id="table-footer"></div>
+      </div>
+
+      <div class="right-col">
+        <div class="card">
+          <h2 class="card-title">Tasks by Priority</h2>
+          <div class="donut-wrap">
+            <svg class="donut-svg" viewBox="0 0 120 120" aria-hidden="true">
+              <circle cx="60" cy="60" r="48" fill="none" stroke="#2a2a3e" stroke-width="18"/>
+              <circle cx="60" cy="60" r="48" fill="none" stroke="#e74c3c" stroke-width="18"
+                stroke-dasharray="0 301.59" stroke-dashoffset="75.4" id="donut-high"/>
+              <circle cx="60" cy="60" r="48" fill="none" stroke="#f39c12" stroke-width="18"
+                stroke-dasharray="0 301.59" id="donut-medium"/>
+              <circle cx="60" cy="60" r="48" fill="none" stroke="#27ae60" stroke-width="18"
+                stroke-dasharray="0 301.59" id="donut-low"/>
+              <text x="60" y="55" text-anchor="middle" class="donut-center-val" id="donut-total">0</text>
+              <text x="60" y="70" text-anchor="middle" class="donut-center-lbl">Tasks</text>
+            </svg>
+            <div class="donut-legend">
+              <div class="legend-item"><span class="dot" style="background:#e74c3c"></span>High (<span id="l-high">0</span>)</div>
+              <div class="legend-item"><span class="dot" style="background:#f39c12"></span>Medium (<span id="l-medium">0</span>)</div>
+              <div class="legend-item"><span class="dot" style="background:#27ae60"></span>Low (<span id="l-low">0</span>)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">📅 Upcoming Deadlines</h2>
+          <div id="upcoming-list" class="upcoming-list" aria-live="polite"></div>
+          <a class="view-calendar" onclick="showPage('analytics')" role="button">View Analytics →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-grid-2">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Productivity Overview</h2>
+          <span class="week-label">This Week</span>
+        </div>
+        <div class="chart-area" id="prod-chart" aria-label="კვირის chart"></div>
+      </div>
+      <div class="card focus-mini-card">
+        <h2 class="card-title">Focus Mode</h2>
+        <div class="focus-ring-wrap" aria-hidden="true">
+          <svg class="focus-ring-svg" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="52" fill="none" stroke="#2a2a3e" stroke-width="8"/>
+            <circle cx="60" cy="60" r="52" fill="none" stroke="#6C5CE7" stroke-width="8"
+              stroke-dasharray="326.7 326.7" stroke-dashoffset="0" stroke-linecap="round"
+              transform="rotate(-90 60 60)" id="mini-ring"/>
+          </svg>
+          <div class="focus-ring-inner">
+            <div class="focus-time-display" id="mini-timer">25:00</div>
+            <div class="focus-time-label">Focus Time</div>
+          </div>
+        </div>
+        <button class="btn-start-focus" onclick="showPage('focus')">▶ Start Focus Session</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════
+       PAGE: TASKS
+  ════════════════════════════════ -->
+  <section class="page" id="page-tasks" aria-label="Tasks">
+    <div class="page-header">
+      <h1 class="page-title">Tasks</h1>
+    </div>
+
+    <div class="card add-form-card">
+      <h2 class="card-title" id="form-mode-title">ახალი Task-ის დამატება</h2>
+      <div class="form-grid">
+        <input type="text" id="f-title" placeholder="Task-ის სახელი..." class="form-input full-col" aria-label="Task-ის სახელი">
+        <div class="form-field">
+          <label class="form-label" for="f-category">კატეგორია</label>
+          <select id="f-category" class="form-input">
+            <option value="სამუშაო">💼 სამუშაო</option>
+            <option value="სწავლა">📚 სწავლა</option>
+            <option value="ჯანმრთელობა">🏃 ჯანმრთელობა</option>
+            <option value="პირადი">👤 პირადი</option>
+            <option value="სხვა">📌 სხვა</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="f-deadline">Deadline</label>
+          <input type="date" id="f-deadline" class="form-input">
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="f-hours">სავარაუდო დრო (სთ)</label>
+          <input type="number" id="f-hours" value="1" min="0.5" max="8" step="0.5" class="form-input">
+        </div>
+        <div class="form-btns full-col">
+          <button class="btn-primary" id="form-submit-btn" onclick="submitTask()">+ Task-ის დამატება</button>
+          <button class="btn-ghost" id="form-cancel-btn" onclick="cancelEdit()" style="display:none">✕ გაუქმება</button>
+        </div>
+      </div>
+      <div class="form-msg" id="form-msg" aria-live="polite"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">ყველა Task</h2>
+      <div id="all-tasks-list" class="all-tasks-list" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════
+       PAGE: FOCUS MODE
+  ════════════════════════════════ -->
+  <section class="page" id="page-focus" aria-label="Focus Mode">
+    <div class="page-header">
+      <h1 class="page-title">Focus Mode</h1>
+      <p class="page-sub">ერთ task-ზე კონცენტრაცია</p>
+    </div>
+
+    <div class="focus-layout">
+      <div class="card focus-card">
+        <div class="focus-session-label" id="focus-session-lbl">Pomodoro · 25 წთ</div>
+        <div class="focus-current-task" id="focus-current-task">აირჩიე task მარჯვნიდან →</div>
+
+        <div class="focus-ring-big-wrap" aria-hidden="true">
+          <svg class="focus-ring-big" viewBox="0 0 200 200">
+            <circle cx="100" cy="100" r="88" fill="none" stroke="#1e1e2e" stroke-width="12"/>
+            <circle cx="100" cy="100" r="88" fill="none" stroke="#6C5CE7" stroke-width="12"
+              stroke-dasharray="552.9 552.9" stroke-dashoffset="0" stroke-linecap="round"
+              transform="rotate(-90 100 100)" id="big-ring"/>
+          </svg>
+          <div class="focus-ring-big-inner">
+            <div class="focus-big-time" id="focus-time" aria-live="polite">25:00</div>
+            <div class="focus-big-label" id="focus-label">კონცენტრირებული სამუშაო</div>
+          </div>
+        </div>
+
+        <div class="focus-btns">
+          <button class="btn-primary" id="focus-start-btn" onclick="toggleFocus()">▶ დაწყება</button>
+          <button class="btn-ghost"   onclick="resetFocus()">↺ გადატვირთვა</button>
+        </div>
+
+        <div class="pomodoro-tabs" role="group" aria-label="რეჟიმის არჩევა">
+          <button class="ptab active" onclick="setPomMode(25,'Pomodoro · 25 წთ',this)">Pomodoro</button>
+          <button class="ptab"        onclick="setPomMode(5,'Short Break · 5 წთ',this)">Short Break</button>
+          <button class="ptab"        onclick="setPomMode(15,'Long Break · 15 წთ',this)">Long Break</button>
+        </div>
+      </div>
+
+      <div class="focus-tasks-side">
+        <div class="card">
+          <h2 class="card-title">Task-ის არჩევა</h2>
+          <div id="focus-task-list" class="focus-task-list" aria-live="polite"></div>
+        </div>
+        <div class="card ai-plan-card">
+          <div class="card-header">
+            <h2 class="card-title">AI-ის გეგმა</h2>
+            <button class="btn-ghost sm" onclick="loadAIPlan()">განახლება</button>
+          </div>
+          <div id="ai-plan-content" class="ai-plan-content" aria-live="polite">
+            <button class="btn-primary" onclick="loadAIPlan()">◈ გეგმის გენერირება</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════
+       PAGE: ANALYTICS
+  ════════════════════════════════ -->
+  <section class="page" id="page-analytics" aria-label="Analytics">
+    <div class="page-header">
+      <h1 class="page-title">Analytics</h1>
+      <p class="page-sub">შენი პროდუქტიულობის ტენდენციები</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-info"><div class="stat-label">სულ Task-ები</div><div class="stat-value" id="a-total">—</div></div>
+        <div class="stat-icon" aria-hidden="true">📋</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-info"><div class="stat-label">შესრულებული</div><div class="stat-value" id="a-done">—</div></div>
+        <div class="stat-icon" aria-hidden="true">✅</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-info"><div class="stat-label">Completion Rate</div><div class="stat-value" id="a-rate">—</div></div>
+        <div class="stat-icon" aria-hidden="true">📈</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-info"><div class="stat-label">Active Tasks</div><div class="stat-value" id="a-active">—</div></div>
+        <div class="stat-icon" aria-hidden="true">⏳</div>
+      </div>
+    </div>
+
+    <div class="dash-grid">
+      <div class="card">
+        <h2 class="card-title">კვირის პროდუქტიულობა</h2>
+        <div class="chart-area" id="analytics-chart" aria-label="კვირის chart"></div>
+      </div>
+      <div class="card">
+        <h2 class="card-title">Priority Breakdown</h2>
+        <div id="analytics-priority" class="priority-breakdown" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ════════════════════════════════
+       PAGE: GOALS
+  ════════════════════════════════ -->
+  <section class="page" id="page-goals" aria-label="Goals">
+    <div class="page-header">
+      <h1 class="page-title">Goals</h1>
+      <p class="page-sub">შენი გრძელვადიანი მიზნები</p>
+    </div>
+    <div class="card">
+      <h2 class="card-title">ახალი მიზნის დამატება</h2>
+      <div class="form-grid">
+        <input type="text" id="g-title" placeholder="მიზნის სახელი..." class="form-input full-col">
+        <div class="form-field">
+          <label class="form-label">კატეგორია</label>
+          <select id="g-category" class="form-input">
+            <option value="კარიერა">💼 კარიერა</option>
+            <option value="სწავლა">📚 სწავლა</option>
+            <option value="ჯანმრთელობა">🏃 ჯანმრთელობა</option>
+            <option value="პირადი">👤 პირადი</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Deadline</label>
+          <input type="date" id="g-deadline" class="form-input">
+        </div>
+        <button class="btn-primary full-col" onclick="addGoal()">+ მიზნის დამატება</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2 class="card-title">ჩემი მიზნები</h2>
+      <div class="goals-grid" id="goals-list">
+        <div class="goal-card">
+          <div class="goal-title">🎓 Python-ის დაუფლება</div>
+          <div class="goal-progress-wrap"><div class="goal-progress-fill" style="width:65%"></div></div>
+          <div class="goal-meta"><span>65% შესრულებული</span><span>31 დეკ</span></div>
+        </div>
+        <div class="goal-card">
+          <div class="goal-title">💪 ყოველდღიური ვარჯიში</div>
+          <div class="goal-progress-wrap"><div class="goal-progress-fill" style="width:40%;background:#27ae60"></div></div>
+          <div class="goal-meta"><span>40% შესრულებული</span><span>31 მარ</span></div>
+        </div>
+        <div class="goal-card">
+          <div class="goal-title">📚 10 წიგნი წელს</div>
+          <div class="goal-progress-wrap"><div class="goal-progress-fill" style="width:30%;background:#f39c12"></div></div>
+          <div class="goal-meta"><span>3/10 წიგნი</span><span>31 დეკ</span></div>
+        </div>
+        <button class="goal-add-btn" onclick="document.getElementById('g-title').focus()">+ ახალი მიზნის დამატება</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════
+       PAGE: NOTES
+  ════════════════════════════════ -->
+  <section class="page" id="page-notes" aria-label="Notes">
+    <div class="page-header">
+      <h1 class="page-title">Notes</h1>
+      <p class="page-sub">შენი ჩანაწერები და იდეები</p>
+    </div>
+    <div class="card">
+      <h2 class="card-title">ახალი ჩანაწერი</h2>
+      <div class="form-grid">
+        <input type="text" id="n-title" placeholder="სათაური..." class="form-input full-col">
+        <textarea id="n-body" placeholder="ჩანაწერი..." class="notes-add-area full-col"></textarea>
+        <div class="form-field">
+          <label class="form-label">ფერი</label>
+          <select id="n-color" class="form-input">
+            <option value="purple">💜 Purple</option>
+            <option value="yellow">💛 Yellow</option>
+            <option value="green">💚 Green</option>
+          </select>
+        </div>
+        <button class="btn-primary" onclick="addNote()" style="align-self:flex-end">+ დამატება</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2 class="card-title">ჩემი ჩანაწერები</h2>
+      <div class="notes-grid" id="notes-list">
+        <div class="note-card purple">
+          <div class="note-title">FlowDay პროექტი</div>
+          <div class="note-body">Flask backend + HTML/CSS/JS frontend. AI-ზე დაფუძნებული task მენეჯმენტი.</div>
+          <div class="note-date">17 მაისი</div>
+        </div>
+        <div class="note-card yellow">
+          <div class="note-title">Python რჩევები</div>
+          <div class="note-body">List comprehensions, decorators, context managers — ყველა დავიმახსოვრე.</div>
+          <div class="note-date">15 მაისი</div>
+        </div>
+        <div class="note-card green">
+          <div class="note-title">Focus tips</div>
+          <div class="note-body">Pomodoro: 25 წთ სამუშაო, 5 წთ დასვენება. ტელეფონი — შეჩუმება!</div>
+          <div class="note-date">12 მაისი</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /main-wrap -->
+
+<!-- ══ EDIT MODAL ══════════════════════════════════════ -->
+<div class="modal-overlay" id="edit-modal" style="display:none" role="dialog" aria-modal="true" aria-label="Task-ის რედაქტირება">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title">Task-ის რედაქტირება ✏️</h3>
+      <button class="modal-close" onclick="closeEditModal()" aria-label="დახურვა">✕</button>
+    </div>
+    <div class="form-grid">
+      <input type="hidden" id="edit-id">
+      <input type="text" id="edit-title" placeholder="Task-ის სახელი..." class="form-input full-col" aria-label="სახელი">
+      <div class="form-field">
+        <label class="form-label" for="edit-category">კატეგორია</label>
+        <select id="edit-category" class="form-input">
+          <option value="სამუშაო">💼 სამუშაო</option>
+          <option value="სწავლა">📚 სწავლა</option>
+          <option value="ჯანმრთელობა">🏃 ჯანმრთელობა</option>
+          <option value="პირადი">👤 პირადი</option>
+          <option value="სხვა">📌 სხვა</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label class="form-label" for="edit-deadline">Deadline</label>
+        <input type="date" id="edit-deadline" class="form-input">
+      </div>
+      <div class="form-field">
+        <label class="form-label" for="edit-hours">დრო (სთ)</label>
+        <input type="number" id="edit-hours" value="1" min="0.5" max="8" step="0.5" class="form-input">
+      </div>
+      <button class="btn-primary full-col" onclick="saveEdit()">💾 შენახვა</button>
+    </div>
+    <div class="form-msg" id="edit-msg" aria-live="polite"></div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+<!-- ══ BOTTOM NAV (mobile) ════════════════════ -->
+<nav class="bottom-nav" aria-label="მობილური მენიუ">
+  <div class="bottom-nav-item active" onclick="showPage('dashboard');setBottomActive(this)" data-bnpage="dashboard">
+    <span class="bn-icon">⊞</span><span class="bn-lbl">Home</span>
+  </div>
+  <div class="bottom-nav-item" onclick="showPage('tasks');setBottomActive(this)" data-bnpage="tasks">
+    <span class="bn-icon">☰</span><span class="bn-lbl">Tasks</span>
+  </div>
+  <div class="bottom-nav-item" onclick="showPage('focus');setBottomActive(this)" data-bnpage="focus">
+    <span class="bn-icon">◎</span><span class="bn-lbl">Focus</span>
+  </div>
+  <div class="bottom-nav-item" onclick="showPage('analytics');setBottomActive(this)" data-bnpage="analytics">
+    <span class="bn-icon">∿</span><span class="bn-lbl">Stats</span>
+  </div>
+  <div class="bottom-nav-item" onclick="showPage('notes');setBottomActive(this)" data-bnpage="notes">
+    <span class="bn-icon">📝</span><span class="bn-lbl">Notes</span>
+  </div>
+</nav>
+
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowDay — რეგისტრაცია</title>
+<meta name="theme-color" content="#6C5CE7">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><polygon points='16,2 28,9 28,23 16,30 4,23 4,9' fill='%236C5CE7'/><circle cx='16' cy='16' r='5' fill='white'/></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+</head>
+<body>
+<div class="auth-page">
+
+  <div class="auth-left">
+    <a href="{{ url_for('landing') }}" class="auth-back">← მთავარ გვერდზე</a>
+    <div class="auth-left-inner">
+      <div class="auth-brand">
+        <svg width="40" height="40" viewBox="0 0 32 32">
+          <polygon points="16,2 28,9 28,23 16,30 4,23 4,9" fill="#6C5CE7"/>
+          <circle cx="16" cy="16" r="5" fill="white"/>
+        </svg>
+        <span>FlowDay</span>
+      </div>
+      <h1 class="auth-title">ანგარიშის შექმნა 🚀</h1>
+      <p class="auth-sub">30 წამში დაიწყე უფრო პროდუქტიული ცხოვრება.</p>
+
+      {% if error %}
+      <div class="auth-error">⚠️ {{ error }}</div>
+      {% endif %}
+
+      <form method="POST" class="auth-form">
+        <div class="form-group">
+          <label>სახელი</label>
+          <input type="text" name="name" placeholder="შენი სახელი" required autocomplete="name">
+        </div>
+        <div class="form-group">
+          <label>ელ-ფოსტა</label>
+          <input type="email" name="email" placeholder="name@example.com" required autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label>პაროლი</label>
+          <div class="input-wrap">
+            <input type="password" name="password" id="pw1" placeholder="მინ. 6 სიმბოლო" required autocomplete="new-password" oninput="checkStrength(this.value)">
+            <button type="button" class="eye-btn" onclick="togglePw('pw1',this)">👁</button>
+          </div>
+          <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
+          <div class="strength-lbl" id="strength-lbl"></div>
+        </div>
+        <div class="form-group">
+          <label>პაროლის დადასტურება</label>
+          <div class="input-wrap">
+            <input type="password" name="confirm" id="pw2" placeholder="გაიმეორე პაროლი" required autocomplete="new-password">
+            <button type="button" class="eye-btn" onclick="togglePw('pw2',this)">👁</button>
+          </div>
+        </div>
+        <button type="submit" class="btn-auth">ანგარიშის შექმნა</button>
+      </form>
+
+      <p class="auth-switch">
+        უკვე გაქვს ანგარიში? <a href="{{ url_for('login') }}">შედი</a>
+      </p>
+    </div>
+  </div>
+
+  <div class="auth-right">
+    <div class="auth-right-content">
+      <div class="ar-badge">✨ უფასოა</div>
+      <h2>დაიწყე<br>FlowDay-ით<br>დღესვე</h2>
+      <div class="ar-features">
+        <div class="ar-feat"><span class="ar-check">✓</span> რეგისტრაცია 30 წამში</div>
+        <div class="ar-feat"><span class="ar-check">✓</span> პირადი dashboard</div>
+        <div class="ar-feat"><span class="ar-check">✓</span> Task-ები დაცულია</div>
+        <div class="ar-feat"><span class="ar-check">✓</span> ყველა ფიჩერი უფასოა</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script>
+function togglePw(id, btn) {
+  const inp = document.getElementById(id);
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  btn.textContent = inp.type === 'password' ? '👁' : '🙈';
+}
+function checkStrength(pw) {
+  const fill = document.getElementById('strength-fill');
+  const lbl  = document.getElementById('strength-lbl');
+  let score = 0;
+  if (pw.length >= 6)  score++;
+  if (pw.length >= 10) score++;
+  if (/[A-Z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+  const levels = [
+    {w:'0%',   c:'#e74c3c', t:''},
+    {w:'25%',  c:'#e74c3c', t:'სუსტი'},
+    {w:'50%',  c:'#f39c12', t:'საშუალო'},
+    {w:'75%',  c:'#f39c12', t:'კარგი'},
+    {w:'100%', c:'#27ae60', t:'ძლიერი ✓'},
+  ];
+  const lvl = levels[Math.min(score, 4)];
+  fill.style.width      = lvl.w;
+  fill.style.background = lvl.c;
+  lbl.textContent       = lvl.t;
+  lbl.style.color       = lvl.c;
+}
+</script>
+</body>
+</html>

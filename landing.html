@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowDay — ინტელექტუალური პროდუქტიულობის სისტემა</title>
+<meta name="description" content="FlowDay — AI-ზე დაფუძნებული task მენეჯმენტი. ავტომატური პრიორიტეტები, დღის გეგმა, Focus Mode.">
+<meta name="theme-color" content="#6C5CE7">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><polygon points='16,2 28,9 28,23 16,30 4,23 4,9' fill='%236C5CE7'/><circle cx='16' cy='16' r='5' fill='white'/></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+</head>
+<body>
+
+<!-- ── NAVBAR ── -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">
+      <svg width="28" height="28" viewBox="0 0 32 32">
+        <polygon points="16,2 28,9 28,23 16,30 4,23 4,9" fill="#6C5CE7"/>
+        <circle cx="16" cy="16" r="5" fill="white"/>
+      </svg>
+      <span>FlowDay</span>
+    </div>
+    <div class="nav-links">
+      <a href="#features">ფიჩერები</a>
+      <a href="#how">როგორ მუშაობს</a>
+      <a href="{{ url_for('login') }}" class="btn-nav-login">შესვლა</a>
+      <a href="{{ url_for('register') }}" class="btn-nav-reg">დარეგისტრირდი</a>
+    </div>
+    <button class="nav-burger" onclick="toggleMobileMenu()">☰</button>
+  </div>
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="#features" onclick="toggleMobileMenu()">ფიჩერები</a>
+    <a href="#how" onclick="toggleMobileMenu()">როგორ მუშაობს</a>
+    <a href="{{ url_for('login') }}">შესვლა</a>
+    <a href="{{ url_for('register') }}" class="btn-nav-reg">დარეგისტრირდი</a>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">✨ AI-ზე დაფუძნებული პროდუქტიულობა</div>
+    <h1 class="hero-title">
+      მართე შენი დრო<br>
+      <span class="gradient-text">ჭკვიანურად</span>
+    </h1>
+    <p class="hero-sub">
+      FlowDay ჩვეულებრივი TODO-სგან განსხვავდება — სისტემა თვითონ განსაზღვრავს
+      პრიორიტეტებს, გეუბნება რა გააკეთო დღეს და ანალიზავს შენს პროდუქტიულობას.
+    </p>
+    <div class="hero-btns">
+      <a href="{{ url_for('register') }}" class="btn-primary-lg">უფასოდ დაიწყე →</a>
+      <a href="#features" class="btn-ghost-lg">გაიგე მეტი</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hstat"><span class="hstat-val">AI</span><span class="hstat-lbl">პრიორიტეტები</span></div>
+      <div class="hstat-div"></div>
+      <div class="hstat"><span class="hstat-val">Focus</span><span class="hstat-lbl">Mode + Timer</span></div>
+      <div class="hstat-div"></div>
+      <div class="hstat"><span class="hstat-val">📊</span><span class="hstat-lbl">ანალიზი</span></div>
+    </div>
+  </div>
+
+  <!-- Dashboard Preview -->
+  <div class="hero-preview">
+    <div class="preview-window">
+      <div class="preview-bar">
+        <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+        <span class="preview-url">flowday · dashboard</span>
+      </div>
+      <div class="preview-body">
+        <div class="preview-sidebar">
+          <div class="ps-item active">⊞ Dashboard</div>
+          <div class="ps-item">☰ Tasks</div>
+          <div class="ps-item">◎ Focus</div>
+          <div class="ps-item">∿ Analytics</div>
+          <div class="ps-item">🎯 Goals</div>
+        </div>
+        <div class="preview-main">
+          <div class="preview-stats">
+            <div class="pstat purple">
+              <div class="pstat-val">12</div>
+              <div class="pstat-lbl">Total Tasks</div>
+            </div>
+            <div class="pstat green">
+              <div class="pstat-val">7</div>
+              <div class="pstat-lbl">Completed</div>
+            </div>
+            <div class="pstat orange">
+              <div class="pstat-val">58%</div>
+              <div class="pstat-lbl">Rate</div>
+            </div>
+          </div>
+          <div class="preview-tasks">
+            <div class="pt-row"><span class="pt-dot high"></span><span class="pt-name">Python exam</span><span class="p-badge High" style="font-size:9px;padding:2px 6px">High</span></div>
+            <div class="pt-row"><span class="pt-dot medium"></span><span class="pt-name">Finish project</span><span class="p-badge Medium" style="font-size:9px;padding:2px 6px">Med</span></div>
+            <div class="pt-row done"><span class="pt-dot low"></span><span class="pt-name" style="text-decoration:line-through">Read a book</span><span class="p-badge Low" style="font-size:9px;padding:2px 6px">Low</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FEATURES ── -->
+<section class="features" id="features">
+  <div class="section-inner">
+    <div class="section-badge">ფიჩერები</div>
+    <h2 class="section-title">რატომ FlowDay?</h2>
+    <p class="section-sub">ჩვეულებრივი TODO-სგან განსხვავება</p>
+
+    <div class="features-grid">
+      <div class="feat-card">
+        <div class="feat-icon purple">🧠</div>
+        <h3>ავტომატური პრიორიტეტები</h3>
+        <p>სისტემა deadline-ის, კატეგორიისა და სირთულის მიხედვით თვითონ ადგენს პრიორიტეტს — შენ არ გჭირდება ფიქრი.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon blue">📅</div>
+        <h3>დღის AI გეგმა</h3>
+        <p>სისტემა გეუბნება: "დღეს ეს 3 task შეასრულე" — შენი ენერგიისა და deadline-ების მიხედვით.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon green">◎</div>
+        <h3>Focus Mode</h3>
+        <p>Pomodoro ტაიმერი + ერთ task-ზე კონცენტრაცია. დანარჩენი სია იმალება — მხოლოდ ამაზე ფოკუსი.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon orange">📊</div>
+        <h3>პროდუქტიულობის ანალიზი</h3>
+        <p>კვირის chart, completion rate, priority breakdown — ხედავ სად ხარ და სად უნდა გააუმჯობესო.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon pink">🎯</div>
+        <h3>Goals & Notes</h3>
+        <p>გრძელვადიანი მიზნები progress bar-ით და ჩანაწერები — ყველაფერი ერთ ადგილას.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon teal">📱</div>
+        <h3>სრულად Responsive</h3>
+        <p>ტელეფონზე, პლანშეტზე, კომპიუტერზე — ყველგან ერთნაირად კარგად გამოიყურება.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── HOW IT WORKS ── -->
+<section class="how" id="how">
+  <div class="section-inner">
+    <div class="section-badge">პროცესი</div>
+    <h2 class="section-title">როგორ მუშაობს?</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>დარეგისტრირდი</h3>
+        <p>სახელი, ელ-ფოსტა, პაროლი — 30 წამი სჭირდება</p>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>Task-ები დაამატე</h3>
+        <p>სახელი + deadline + კატეგორია — AI priority-ს თვითონ ითვლის</p>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>გეგმა მიიღე</h3>
+        <p>სისტემა გეუბნება დღეს რა გააკეთო — Focus Mode-ით ასრულებ</p>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <h3>გაანალიზე</h3>
+        <p>Analytics გვერდზე ხედავ შენს პროგრესს და ტენდენციებს</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ── -->
+<section class="cta">
+  <div class="section-inner" style="text-align:center">
+    <h2 class="cta-title">მზად ხარ უფრო პროდუქტიული გახდე?</h2>
+    <p class="cta-sub">უფასოდ, ახლავე, რეგისტრაცია 30 წამში</p>
+    <a href="{{ url_for('register') }}" class="btn-primary-lg">დაიწყე ახლავე →</a>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <svg width="22" height="22" viewBox="0 0 32 32">
+        <polygon points="16,2 28,9 28,23 16,30 4,23 4,9" fill="#6C5CE7"/>
+        <circle cx="16" cy="16" r="5" fill="white"/>
+      </svg>
+      FlowDay
+    </div>
+    <p class="footer-copy">© 2025 FlowDay · ინტელექტუალური პროდუქტიულობის სისტემა</p>
+  </div>
+</footer>
+
+<script>
+function toggleMobileMenu() {
+  document.getElementById('mobile-menu').classList.toggle('open');
+}
+</script>
+</body>
+</html>
